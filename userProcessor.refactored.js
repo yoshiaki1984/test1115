@@ -54,7 +54,7 @@ function formatName(name, formatOption) {
 }
 
 function generateUserId(existingId) {
-  return existingId || Math.random().toString(36).substr(2, 9);
+  return existingId || Math.random().toString(36).substring(2, 11);
 }
 
 // Transformation function

@@ -25,7 +25,7 @@ function processUserData(data, options) {
                     if (user.age >= 18 && user.age <= 120) {
                       // Process valid user
                       let processedUser = {
-                        id: user.id || Math.random().toString(36).substr(2, 9),
+                        id: user.id || Math.random().toString(36).substring(2, 11),
                         name: user.name.trim(),
                         email: user.email.toLowerCase().trim(),
                         age: user.age,
