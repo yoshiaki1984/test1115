@@ -111,3 +111,14 @@ fukubiki-app/
 - 演出中は右下の「結果を見る」でスキップできます
 - 当選画面の案内文（「福引券は捨てずに…」）は `public/app.js` の `showResult` 内で変更できます
 - 本番公開時は HTTPS のリバースプロキシ（nginx 等）の背後に置き、`ADMIN_PASSWORD` を必ず設定してください
+
+## サーバー不要版（claude.ai Artifact）
+
+`artifact/` にはサーバーを使わないシングルHTML版があります。当選リストをHTML内に埋め込み、
+編集権限を持つ人がページ内の「管理者用」からPDFを読み込むと、ページ自身を再公開して全員に反映します（PDF解析はブラウザ内の pdf.js）。
+
+```bash
+npm run build:artifact -- samples/2025_tousen.pdf --title "2025年 当選発表"   # dist/fukubiki.html
+```
+
+出力した HTML を claude.ai の Artifact として公開（capability: `artifact`）すると、リンクを共有した人がスマホから利用できます。

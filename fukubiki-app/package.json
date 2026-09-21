@@ -9,7 +9,8 @@
     "start": "node --no-warnings=ExperimentalWarning server.js",
     "dev": "node --no-warnings=ExperimentalWarning --watch server.js",
     "import": "node --no-warnings=ExperimentalWarning scripts/import-pdf.js",
-    "test": "node --no-warnings=ExperimentalWarning --test \"test/**/*.test.js\""
+    "test": "node --no-warnings=ExperimentalWarning --test \"test/**/*.test.js\"",
+    "build:artifact": "node --no-warnings=ExperimentalWarning scripts/build-artifact.js"
   },
   "engines": {
     "node": ">=22.13"

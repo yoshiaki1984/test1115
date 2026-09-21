@@ -1,0 +1,217 @@
+<meta charset="utf-8">
+<title>福引ドキドキ照合</title>
+<meta name="theme-color" content="#12081f">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style id="app-css">
+:root{--bg:#12081f;--bg2:#1d0f33;--ink:#f7f3ff;--muted:#b7a9d1;--gold:#f5c542;--gold2:#ffe28a;--cream:#fff7d1;--red:#ff3b5c;--orange:#ff8a3d;--pink:#ff6ec7;--panel:rgba(255,255,255,.06);--line:rgba(255,255,255,.13);--display:"Dela Gothic One","Hiragino Sans","Noto Sans JP",sans-serif;--body:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);min-height:100%;overflow-x:hidden;touch-action:manipulation;-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.5}
+[hidden]{display:none!important}
+button{font-family:inherit}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(60% 40% at 50% -10%,rgba(245,197,66,.25),transparent 70%),radial-gradient(50% 40% at 100% 100%,rgba(255,110,199,.18),transparent 70%),linear-gradient(180deg,var(--bg2),var(--bg))}
+.wrap{position:relative;z-index:1;max-width:480px;margin:0 auto;padding-inline:16px;padding-block:12px 28px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:6px 14px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.mark{width:40px;height:40px;flex:none;border-radius:50%;background:radial-gradient(circle at 50% 50%,var(--cream) 0 22%,var(--red) 23% 50%,var(--gold) 51% 100%);box-shadow:0 6px 18px rgba(245,197,66,.35)}
+.top h1{font-family:var(--display);font-weight:400;font-size:19px;margin:0;letter-spacing:.02em;text-wrap:balance}
+.draw-title{margin:2px 0 0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.icon-btn{flex:none;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:18px;cursor:pointer}
+.icon-btn[aria-pressed=false]{opacity:.55}
+.icon-btn:focus-visible,.primary:focus-visible,.ghost:focus-visible,.num:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px 18px;margin-bottom:14px;backdrop-filter:blur(8px)}
+.label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:700;letter-spacing:.06em}
+.field{position:relative}
+.num{width:100%;font-family:var(--display);font-size:46px;letter-spacing:.14em;text-align:center;font-variant-numeric:tabular-nums;padding:12px 44px 12px 14px;border-radius:14px;border:2px solid var(--line);background:rgba(0,0,0,.35);color:var(--gold2);outline:none;transition:border-color .2s,box-shadow .2s}
+.num:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(245,197,66,.18)}
+.num::placeholder{color:rgba(255,255,255,.16)}
+.clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:none;background:rgba(255,255,255,.15);color:var(--ink);font-size:18px;cursor:pointer}
+.hint{font-size:12px;color:var(--muted);margin:10px 2px 16px}
+.notice{font-size:13px;color:#ffb4c2;background:rgba(255,59,92,.12);border:1px solid rgba(255,59,92,.35);border-radius:12px;padding:10px 12px;margin:12px 0 0}
+.primary{width:100%;border:none;border-radius:16px;padding:15px 18px;cursor:pointer;background:linear-gradient(135deg,var(--red),var(--orange) 55%,var(--gold));color:#fff;font-family:var(--display);font-weight:400;font-size:20px;letter-spacing:.04em;box-shadow:0 10px 30px rgba(255,90,60,.35),inset 0 1px 0 rgba(255,255,255,.35);display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .1s,filter .2s,opacity .2s;animation:breathe 2.4s ease-in-out infinite}
+.primary:active{transform:scale(.97)}
+.primary:disabled{filter:grayscale(.8);opacity:.5;animation:none;box-shadow:none;cursor:default}
+.primary .sub{font-family:var(--body);font-size:12px;font-weight:500;opacity:.9}
+@keyframes breathe{0%,100%{box-shadow:0 10px 30px rgba(255,90,60,.35)}50%{box-shadow:0 10px 40px rgba(255,140,60,.6)}}
+.stats{display:flex;justify-content:space-around;padding:14px}
+.stat{display:flex;flex-direction:column;align-items:center;gap:2px}
+.stat b{font-family:var(--display);font-weight:400;font-size:22px;color:var(--gold2);font-variant-numeric:tabular-nums}
+.stat span{font-size:11px;color:var(--muted)}
+.h2{font-size:13px;color:var(--muted);margin:8px 4px;font-weight:700;letter-spacing:.06em}
+.hist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.hist li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line);font-size:13px;cursor:pointer}
+.hist .n{font-family:var(--display);font-size:15px;min-width:56px;font-variant-numeric:tabular-nums}
+.tag{font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;flex:none}
+.tag.win{background:rgba(245,197,66,.2);color:var(--gold2)}.tag.lose{background:rgba(122,122,140,.25);color:#c9c9d6}
+.hist .p{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.foot{text-align:center;padding-block:10px 0}
+.foot button{background:none;border:none;color:rgba(255,255,255,.3);font-size:12px;cursor:pointer;font-family:inherit;padding:8px}
+/* stage */
+.stage{position:fixed;inset:0;z-index:50;background:radial-gradient(80% 60% at 50% 40%,#2a1650,#0b0514 80%);display:flex;align-items:center;justify-content:center;overflow:hidden;transition:background .4s}
+.stage.reach{background:radial-gradient(80% 60% at 50% 40%,#5a0a1e,#16020a 80%);animation:flash .35s steps(2) infinite}
+.stage.super{background:radial-gradient(80% 60% at 50% 40%,#6d4b00,#1a1000 80%);animation:sflash .25s steps(2) infinite}
+.stage.shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97) 3}
+.stage.win{background:radial-gradient(80% 60% at 50% 30%,#6e4a00,#1c1000 80%)}
+.stage.win.grand{background:radial-gradient(80% 60% at 50% 30%,#8a0a3b,#2a0010 80%)}
+.stage.lose{background:radial-gradient(80% 60% at 50% 40%,#2b2b36,#0d0d12 80%)}
+@keyframes flash{0%{filter:brightness(1)}100%{filter:brightness(1.35)}}
+@keyframes sflash{0%{filter:brightness(1) hue-rotate(0)}100%{filter:brightness(1.5) hue-rotate(40deg)}}
+@keyframes shake{10%,90%{transform:translate3d(-2px,0,0)}20%,80%{transform:translate3d(4px,0,0)}30%,50%,70%{transform:translate3d(-8px,0,0)}40%,60%{transform:translate3d(8px,0,0)}}
+.inner{position:relative;z-index:2;width:100%;max-width:480px;padding:24px;text-align:center}
+.msg{font-family:var(--display);font-weight:400;font-size:20px;margin:0 0 18px;min-height:1.5em}
+.msg.pop{animation:pop .35s ease-out}
+.sub{font-size:14px;color:var(--muted);margin:18px 0 0;min-height:1.4em}
+@keyframes pop{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.12);opacity:1}100%{transform:scale(1)}}
+.reel{display:flex;justify-content:center;gap:8px}
+.d{width:62px;height:88px;border-radius:12px;background:linear-gradient(180deg,#fffdf5,#e9dcb8);color:#1a0b2e;font-family:var(--display);font-size:50px;line-height:88px;font-variant-numeric:tabular-nums;box-shadow:inset 0 -8px 14px rgba(0,0,0,.18),0 8px 20px rgba(0,0,0,.45);overflow:hidden}
+.d.spin{animation:blur .08s linear infinite}
+.d.lock{animation:lock .3s cubic-bezier(.2,1.4,.4,1);background:linear-gradient(180deg,#fff7d1,#f5c542)}
+@keyframes blur{0%{filter:blur(.5px);transform:translateY(-2px)}100%{filter:blur(1.2px);transform:translateY(2px)}}
+@keyframes lock{0%{transform:scale(1.25)}100%{transform:scale(1)}}
+@media (max-width:360px){.d{width:54px;height:76px;font-size:42px;line-height:76px}}
+.scan{margin:22px auto 0;width:80%;height:8px;border-radius:999px;background:rgba(255,255,255,.12);overflow:hidden}
+.scan i{display:block;width:35%;height:100%;border-radius:999px;background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:scan .9s ease-in-out infinite}
+@keyframes scan{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+.banner{position:absolute;left:-10%;right:-10%;top:50%;transform:translateY(-50%) rotate(-6deg);background:linear-gradient(90deg,var(--red),var(--orange),var(--gold),var(--orange),var(--red));background-size:200% 100%;color:#fff;font-family:var(--display);font-size:42px;padding:8px 0;text-shadow:0 3px 0 rgba(0,0,0,.35);letter-spacing:.1em;pointer-events:none;animation:bin .4s cubic-bezier(.2,1.4,.4,1),bshift .6s linear infinite}
+@keyframes bin{0%{transform:translateY(-50%) rotate(-6deg) scale(0)}100%{transform:translateY(-50%) rotate(-6deg) scale(1)}}
+@keyframes bshift{0%{background-position:0 0}100%{background-position:200% 0}}
+.skip{position:absolute;z-index:3;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));background:rgba(0,0,0,.45);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer}
+.fx{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.result{animation:rin .5s cubic-bezier(.2,1.3,.4,1)}
+@keyframes rin{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.badge{display:inline-block;margin:0 0 10px;padding:6px 16px;border-radius:999px;font-weight:700;font-size:14px;letter-spacing:.15em}
+.rtitle{font-family:var(--display);font-weight:400;font-size:54px;margin:0;line-height:1.1;letter-spacing:.05em;text-wrap:balance}
+.rnum{font-size:20px;margin:8px 0 18px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.rnum b{color:var(--ink);font-family:var(--display);font-weight:400;font-size:28px}
+.prize{background:rgba(255,255,255,.95);color:#1a0b2e;border-radius:16px;padding:16px 18px;margin:0 auto 14px;box-shadow:0 16px 40px rgba(0,0,0,.45);animation:pin .6s .25s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes pin{0%{transform:translateY(30px) scale(.9);opacity:0}100%{transform:none;opacity:1}}
+.prize small{display:block;margin:0 0 6px;font-size:12px;color:#7a6a99;font-weight:700;letter-spacing:.2em}
+.prize p{margin:0;font-size:19px;font-weight:700;line-height:1.35;word-break:break-word}
+.note{font-size:13px;color:var(--muted);margin:8px 0 0}
+.near{font-size:13px;margin:14px 0 0;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.07);color:#ffd9a3}
+.again{margin-top:22px;animation:none}
+.stage.win .badge{background:var(--gold);color:#3a2600}
+.stage.win .rtitle{color:var(--gold2);text-shadow:0 0 24px rgba(245,197,66,.8),0 4px 0 rgba(0,0,0,.3);animation:glow 1.2s ease-in-out infinite alternate}
+.stage.win.grand .badge{background:linear-gradient(90deg,var(--red),var(--gold),#35e0a1,#4fa3ff,var(--pink));background-size:300% 100%;color:#fff;animation:bshift 2s linear infinite}
+.stage.win.grand .rtitle{font-size:44px;background:linear-gradient(90deg,#ffe28a,#fff,#ffe28a);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}
+.stage.lose .badge{background:rgba(255,255,255,.15);color:#d0d0dc}
+.stage.lose .rtitle{color:#c9c9d6}
+@keyframes glow{from{text-shadow:0 0 12px rgba(245,197,66,.5),0 4px 0 rgba(0,0,0,.3)}to{text-shadow:0 0 36px rgba(245,197,66,1),0 4px 0 rgba(0,0,0,.3)}}
+/* admin */
+.admin{border-color:rgba(245,197,66,.4)}
+.admin h2{font-family:var(--display);font-weight:400;font-size:16px;margin:0 0 6px}
+.admin p{font-size:13px;color:var(--muted);margin:0 0 12px}
+.file{display:block;padding:18px 12px;border:2px dashed rgba(245,197,66,.5);border-radius:14px;text-align:center;color:var(--gold2);font-weight:700;cursor:pointer;margin-bottom:12px}
+.file input{position:absolute;width:1px;height:1px;opacity:0}
+.tfield{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;font-size:13px;color:var(--muted)}
+.tfield input,.tfield textarea{font:inherit;font-size:16px;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.35);color:var(--ink);width:100%}
+.tfield textarea{min-height:110px;font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row .ghost,.row .primary{flex:1}
+.ghost{border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-weight:700;font-size:15px;cursor:pointer;color:var(--ink);background:rgba(255,255,255,.1)}
+.ghost:disabled,.primary.sm:disabled{opacity:.45;cursor:default}
+.primary.sm{font-size:16px;padding:12px 14px;animation:none}
+.amsg{font-size:13px;padding:10px 12px;border-radius:12px;margin:12px 0 0}
+.amsg.ok{background:rgba(53,224,161,.14);color:#a8f5d8}.amsg.err{background:rgba(255,59,92,.14);color:#ffb4c2}.amsg.warn{background:rgba(245,197,66,.14);color:var(--gold2)}
+.pv{margin-top:12px;max-height:40vh;overflow:auto;border:1px solid var(--line);border-radius:12px}
+.pv table{width:100%;border-collapse:collapse;font-size:13px}
+.pv td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.pv td:first-child{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.tier{display:inline-block;font-size:10px;padding:1px 6px;border-radius:999px;margin-left:4px;vertical-align:middle}
+.tier.grand{background:var(--red);color:#fff}.tier.upper{background:var(--gold);color:#3a2600}.tier.regular{background:rgba(255,255,255,.15)}
+details summary{cursor:pointer;color:var(--gold2);font-weight:700;font-size:14px;margin-bottom:10px}
+@media (prefers-reduced-motion:reduce){.stage.reach,.stage.super,.stage.shake,.primary,.d.spin,.scan i,.banner,.stage.win .rtitle{animation:none!important}}
+</style>
+
+<div class="glow" aria-hidden="true"></div>
+<div id="app-root">
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true"></div>
+      <div>
+        <h1>福引ドキドキ照合</h1>
+        <p id="draw-title" class="draw-title"></p>
+      </div>
+    </div>
+    <button id="sound-toggle" class="icon-btn" type="button" aria-label="効果音の切り替え" aria-pressed="true">🔊</button>
+  </header>
+
+  <main>
+    <section class="card">
+      <label for="number" class="label">あなたの福引番号</label>
+      <div class="field">
+        <input id="number" class="num" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" enterkeyhint="go" maxlength="6" placeholder="0000" aria-describedby="entry-hint">
+        <button id="clear" class="clear" type="button" aria-label="入力をクリア" hidden>×</button>
+      </div>
+      <p id="entry-hint" class="hint">福引券の番号を入れて、照合ボタンを押してください</p>
+      <button id="check" class="primary" type="button" disabled>
+        <span>運命の照合スタート</span>
+        <span class="sub">ドキドキ…</span>
+      </button>
+      <p id="not-registered" class="notice" hidden>当選番号はまだ登録されていません。</p>
+    </section>
+
+    <section class="card stats" id="stats" hidden>
+      <div class="stat"><b id="st-total">-</b><span>当選本数</span></div>
+      <div class="stat"><b id="st-grand">-</b><span>特賞</span></div>
+      <div class="stat"><b id="st-upper">-</b><span>上位賞</span></div>
+    </section>
+
+    <section id="history" hidden>
+      <h2 class="h2">最近チェックした番号</h2>
+      <ul id="history-list" class="hist"></ul>
+    </section>
+
+    <section class="card admin" id="admin" hidden>
+      <h2>当選番号の登録（管理）</h2>
+      <p>昨年と同じレイアウト（「当選番号」「品名」の2列表）の発表PDFを読み込みます。「公開する」でこのページが更新され、リンクを開いた全員に反映されます。</p>
+      <label class="tfield">タイトル<input id="adm-title" type="text" placeholder="例: 2026年 当選発表"></label>
+      <label class="file"><input id="adm-file" type="file" accept="application/pdf,.pdf"><span id="adm-file-label">📄 PDFファイルを選択</span></label>
+      <details>
+        <summary>テキストから登録する（PDFが読めない場合）</summary>
+        <label class="tfield">1行に「番号,品名」<textarea id="adm-text" placeholder="2204,【特賞】トヨタ クラウンクロスオーバー&#10;2,Dyson：Supersonicヘアドライヤー"></textarea></label>
+        <button id="adm-parse-text" class="ghost" type="button">テキストを解析</button>
+      </details>
+      <div id="adm-msg"></div>
+      <div id="adm-preview"></div>
+      <div class="row" style="margin-top:12px">
+        <button id="adm-publish" class="primary sm" type="button" disabled>この内容で公開する</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button id="adm-clear" class="ghost" type="button">登録を消して公開</button>
+        <button id="adm-close" class="ghost" type="button">閉じる</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot"><button id="admin-open" type="button">管理者用（PDF登録）</button></footer>
+</div>
+
+<div id="stage" class="stage" hidden aria-live="polite">
+  <div class="inner">
+    <div id="phase">
+      <p id="msg" class="msg">照合開始…</p>
+      <div id="reel" class="reel" aria-hidden="true"></div>
+      <div class="scan" id="scan" hidden><i></i></div>
+      <p id="sub" class="sub"></p>
+      <div class="banner" id="banner" hidden><span>激アツ!!</span></div>
+    </div>
+    <div id="result" class="result" hidden>
+      <p id="badge" class="badge"></p>
+      <h2 id="rtitle" class="rtitle"></h2>
+      <p id="rnum" class="rnum"></p>
+      <div id="prize" class="prize" hidden><small>当選商品</small><p id="prize-name"></p></div>
+      <p id="note" class="note"></p>
+      <p id="near" class="near" hidden></p>
+      <button id="again" class="primary again" type="button">もう一度チェックする</button>
+    </div>
+  </div>
+  <button id="skip" class="skip" type="button" hidden>結果を見る ≫</button>
+  <canvas id="fx" class="fx" aria-hidden="true"></canvas>
+</div>
+</div>
+
+<script id="winners-data" type="application/json">__DATA__</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script id="app">__APP__</script>
