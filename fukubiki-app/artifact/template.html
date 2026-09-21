@@ -45,7 +45,7 @@ button{font-family:inherit}
 .tag.win{background:rgba(245,197,66,.2);color:var(--gold2)}.tag.lose{background:rgba(122,122,140,.25);color:#c9c9d6}
 .hist .p{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .foot{text-align:center;padding-block:10px 0}
-.foot button{background:none;border:none;color:rgba(255,255,255,.3);font-size:12px;cursor:pointer;font-family:inherit;padding:8px}
+.foot button{background:rgba(255,255,255,.06);border:1px dashed rgba(245,197,66,.45);border-radius:12px;color:var(--gold2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;padding:12px 18px;width:100%}
 /* stage */
 .stage{position:fixed;inset:0;z-index:50;background:radial-gradient(80% 60% at 50% 40%,#2a1650,#0b0514 80%);display:flex;align-items:center;justify-content:center;overflow:hidden;transition:background .4s}
 .stage.reach{background:radial-gradient(80% 60% at 50% 40%,#5a0a1e,#16020a 80%);animation:flash .35s steps(2) infinite}
@@ -165,7 +165,8 @@ details summary{cursor:pointer;color:var(--gold2);font-weight:700;font-size:14px
 
     <section class="card admin" id="admin" hidden>
       <h2>当選番号の登録（管理）</h2>
-      <p>昨年と同じレイアウト（「当選番号」「品名」の2列表）の発表PDFを読み込みます。「公開する」でこのページが更新され、リンクを開いた全員に反映されます。</p>
+      <p>昨年と同じレイアウト（「当選番号」「品名」の2列表）の発表PDFを読み込みます。「公開する」でこのページが更新され、リンクを開いた全員に反映されます。登録できるのはこのページの編集権限がある人だけです。</p>
+      <div id="adm-env" class="amsg warn" hidden style="margin:0 0 12px">この開き方では公開できません。claude.ai にログインした状態でArtifactのリンクを開き直してください。</div>
       <label class="tfield">タイトル<input id="adm-title" type="text" placeholder="例: 2026年 当選発表"></label>
       <label class="file"><input id="adm-file" type="file" accept="application/pdf,.pdf"><span id="adm-file-label">📄 PDFファイルを選択</span></label>
       <details>
@@ -185,7 +186,7 @@ details summary{cursor:pointer;color:var(--gold2);font-weight:700;font-size:14px
     </section>
   </main>
 
-  <footer class="foot"><button id="admin-open" type="button">管理者用（PDF登録）</button></footer>
+  <footer class="foot"><button id="admin-open" type="button">🛠 管理者用: 当選発表PDFを登録する</button></footer>
 </div>
 
 <div id="stage" class="stage" hidden aria-live="polite">

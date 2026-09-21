@@ -10,7 +10,7 @@
     result: $('result'), badge: $('badge'), rtitle: $('rtitle'), rnum: $('rnum'), prize: $('prize'), prizeName: $('prize-name'),
     note: $('note'), near: $('near'), again: $('again'), skip: $('skip'), fx: $('fx'),
     admin: $('admin'), adminOpen: $('admin-open'), admTitle: $('adm-title'), admFile: $('adm-file'), admFileLabel: $('adm-file-label'),
-    admText: $('adm-text'), admParseText: $('adm-parse-text'), admMsg: $('adm-msg'), admPreview: $('adm-preview'),
+    admText: $('adm-text'), admParseText: $('adm-parse-text'), admMsg: $('adm-msg'), admPreview: $('adm-preview'), admEnv: $('adm-env'),
     admPublish: $('adm-publish'), admClear: $('adm-clear'), admClose: $('adm-close'),
   };
   const TIER_LABEL = { grand: '特賞', upper: '上位賞', regular: '当選' };
@@ -388,9 +388,9 @@
     const use = window.claude && typeof window.claude.use === 'function' ? window.claude.use('artifact') : Promise.resolve(null);
     use.then((api) => {
       artifactApi = api;
-      if (!api) { el.adminOpen.hidden = true; el.admin.hidden = true; return; }
-      el.admPublish.disabled = !pending || !pending.entries.length;
-    }).catch(() => { artifactApi = null; el.adminOpen.hidden = true; });
+      el.admEnv.hidden = !!api;
+      el.admPublish.disabled = !api || !pending || !pending.entries.length;
+    }).catch(() => { artifactApi = null; el.admEnv.hidden = false; });
   }
 
   // ---------------- 初期化 ----------------
