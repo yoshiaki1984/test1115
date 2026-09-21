@@ -122,3 +122,12 @@ npm run build:artifact -- samples/2025_tousen.pdf --title "2025年 当選発表"
 ```
 
 出力した HTML を claude.ai の Artifact として公開（capability: `artifact`）すると、リンクを共有した人がスマホから利用できます。
+
+### ID・パスワード保護
+
+`--id` と `--pass` を付けてビルドすると、当選リストは ID＋パスワードから導出した鍵（PBKDF2 → AES-GCM）で暗号化して埋め込まれ、ページはログイン必須になります。正しい組み合わせが無いとページのソースを見ても当選データは読めません。
+ページ内の管理パネルからも ID／パスワードを変更して再公開できます。`<meta name="robots" content="noindex">` を入れているため検索エンジンの索引対象になりません。
+
+```bash
+npm run build:artifact -- samples/2025_tousen.pdf --title "2026年 当選発表" --id 好きなID --pass 好きなパスワード
+```

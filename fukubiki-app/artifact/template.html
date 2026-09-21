@@ -1,5 +1,6 @@
 <meta charset="utf-8">
 <title>福引ドキドキ照合</title>
+<meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <meta name="theme-color" content="#12081f">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <style id="app-css">
@@ -138,7 +139,17 @@ details summary{cursor:pointer;color:var(--gold2);font-weight:700;font-size:14px
   </header>
 
   <main>
-    <section class="card">
+    <section class="card" id="login" hidden>
+      <label class="label" for="login-id">ログイン</label>
+      <p class="hint" style="margin:0 0 12px">このページは関係者限定です。IDとパスワードを入力してください。</p>
+      <label class="tfield">ID<input id="login-id" type="text" autocomplete="username" autocapitalize="off" spellcheck="false"></label>
+      <label class="tfield">パスワード<input id="login-pass" type="password" autocomplete="current-password"></label>
+      <label class="hint" style="display:flex;gap:8px;align-items:center;margin:0 0 14px"><input id="login-remember" type="checkbox" checked>この端末で記憶する</label>
+      <button id="login-btn" class="primary sm" type="button">ログイン</button>
+      <p id="login-msg" class="notice" hidden></p>
+    </section>
+
+    <section class="card" id="entry" hidden>
       <label for="number" class="label">あなたの福引番号</label>
       <div class="field">
         <input id="number" class="num" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" enterkeyhint="go" maxlength="6" placeholder="0000" aria-describedby="entry-hint">
@@ -170,10 +181,16 @@ details summary{cursor:pointer;color:var(--gold2);font-weight:700;font-size:14px
       <p>昨年と同じレイアウト（「当選番号」「品名」の2列表）の発表PDFを読み込みます。「公開する」でこのページが更新され、リンクを開いた全員に反映されます。登録できるのはこのページの編集権限がある人だけです。</p>
       <div id="adm-env" class="amsg warn" hidden style="margin:0 0 12px">この開き方では公開できません。claude.ai にログインした状態でArtifactのリンクを開き直してください。</div>
       <label class="tfield">タイトル<input id="adm-title" type="text" placeholder="例: 2026年 当選発表"></label>
+      <label class="hint" style="display:flex;gap:8px;align-items:center;margin:0 0 10px"><input id="adm-protect" type="checkbox" checked>IDとパスワードで保護する（当選データを暗号化して公開）</label>
+      <div class="row" id="adm-cred">
+        <label class="tfield" style="flex:1">ID<input id="adm-id" type="text" autocapitalize="off" spellcheck="false"></label>
+        <label class="tfield" style="flex:1">パスワード<input id="adm-pass" type="text" autocapitalize="off" spellcheck="false"></label>
+      </div>
+      <p class="hint" style="margin:-4px 0 12px">IDとパスワードを変えて公開すると、全員が新しいものでログインし直しになります。</p>
       <label class="file"><input id="adm-file" type="file" accept="application/pdf,.pdf"><span id="adm-file-label">📄 PDFファイルを選択</span></label>
       <details>
         <summary>テキストから登録する（PDFが読めない場合）</summary>
-        <label class="tfield">1行に「番号,品名」<textarea id="adm-text" placeholder="2204,【特賞】トヨタ クラウンクロスオーバー&#10;2,Dyson：Supersonicヘアドライヤー"></textarea></label>
+        <label class="tfield">1行に「番号,品名」<textarea id="adm-text" placeholder="1234,【特賞】商品名&#10;56,商品名"></textarea></label>
         <button id="adm-parse-text" class="ghost" type="button">テキストを解析</button>
       </details>
       <div id="adm-msg"></div>
@@ -182,6 +199,7 @@ details summary{cursor:pointer;color:var(--gold2);font-weight:700;font-size:14px
         <button id="adm-publish" class="primary sm" type="button" disabled>この内容で公開する</button>
       </div>
       <div class="row" style="margin-top:8px">
+        <button id="adm-logout" class="ghost" type="button">この端末からログアウト</button>
         <button id="adm-clear" class="ghost" type="button">登録を消して公開</button>
         <button id="adm-close" class="ghost" type="button">閉じる</button>
       </div>

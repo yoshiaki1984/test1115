@@ -11,7 +11,9 @@
     note: $('note'), near: $('near'), soundHint: $('sound-hint'), again: $('again'), skip: $('skip'), fx: $('fx'),
     admin: $('admin'), adminOpen: $('admin-open'), admTitle: $('adm-title'), admFile: $('adm-file'), admFileLabel: $('adm-file-label'),
     admText: $('adm-text'), admParseText: $('adm-parse-text'), admMsg: $('adm-msg'), admPreview: $('adm-preview'), admEnv: $('adm-env'),
-    admPublish: $('adm-publish'), admClear: $('adm-clear'), admClose: $('adm-close'),
+    admPublish: $('adm-publish'), admClear: $('adm-clear'), admClose: $('adm-close'), admLogout: $('adm-logout'),
+    admProtect: $('adm-protect'), admCred: $('adm-cred'), admId: $('adm-id'), admPass: $('adm-pass'),
+    login: $('login'), loginId: $('login-id'), loginPass: $('login-pass'), loginRemember: $('login-remember'), loginBtn: $('login-btn'), loginMsg: $('login-msg'), entry: $('entry'),
   };
   const TIER_LABEL = { grand: '特賞', upper: '上位賞', regular: '当選' };
   const HISTORY_KEY = 'fukubiki.history';
@@ -19,13 +21,74 @@
   const NEAR_RANGE = 1;
   const SILENT_WAV = 'data:audio/wav;base64,UklGRsQPAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YaAPAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA';
 
-  // ---------------- データ ----------------
+  // ---------------- データ（暗号化されている場合はログイン後に復号） ----------------
+  const CRED_KEY = 'fukubiki.cred';
   let draw = { title: '', entries: [] };
   try { draw = JSON.parse($('winners-data').textContent || '{}'); } catch { draw = { title: '', entries: [] }; }
-  if (!Array.isArray(draw.entries)) draw.entries = [];
+  const locked = !!draw.locked;
+  if (!locked && !Array.isArray(draw.entries)) draw.entries = [];
   const byNumber = new Map();
-  for (const e of draw.entries) { if (!byNumber.has(e.number)) byNumber.set(e.number, []); byNumber.get(e.number).push(e); }
-  const registered = draw.entries.length > 0;
+  let registered = false;
+  let cred = null; // {id, pass} ログイン済みの資格情報（暗号化して公開する際にも使う）
+
+  function applyEntries(entries) {
+    draw.entries = Array.isArray(entries) ? entries : [];
+    byNumber.clear();
+    for (const e of draw.entries) { if (!byNumber.has(e.number)) byNumber.set(e.number, []); byNumber.get(e.number).push(e); }
+    registered = draw.entries.length > 0;
+  }
+
+  // --- WebCrypto: PBKDF2(id + pass) → AES-GCM ---
+  const enc = new TextEncoder(), dec = new TextDecoder();
+  const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+  const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  async function deriveKey(id, pass, salt) {
+    const km = await crypto.subtle.importKey('raw', enc.encode(`${String(id).trim()}\n${String(pass)}`), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 120000, hash: 'SHA-256' }, km, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  }
+  async function encryptEntries(entries, id, pass) {
+    const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await deriveKey(id, pass, salt);
+    const data = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(entries)));
+    return { salt: b64(salt), iv: b64(iv), cipher: b64(data) };
+  }
+  async function decryptEntries(d, id, pass) {
+    const key = await deriveKey(id, pass, unb64(d.salt));
+    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(d.iv) }, key, unb64(d.cipher));
+    return JSON.parse(dec.decode(plain));
+  }
+  async function tryUnlock(id, pass) {
+    if (!locked) return true;
+    try { applyEntries(await decryptEntries(draw, id, pass)); cred = { id: String(id).trim(), pass: String(pass) }; return true; }
+    catch { return false; }
+  }
+  function showLocked(isLocked) {
+    el.login.hidden = !isLocked; el.entry.hidden = isLocked;
+    el.stats.hidden = isLocked || !registered; el.history.hidden = isLocked || el.history.hidden;
+    el.adminOpen.hidden = isLocked; if (isLocked) el.admin.hidden = true;
+  }
+  async function initLock() {
+    if (!locked) { applyEntries(draw.entries); showLocked(false); renderStatus(); return; }
+    if (!window.crypto || !crypto.subtle) { el.login.hidden = false; el.entry.hidden = true; el.loginMsg.textContent = 'このブラウザでは復号できません（https で開いてください）。'; el.loginMsg.hidden = false; return; }
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(CRED_KEY) || sessionStorage.getItem(CRED_KEY) || 'null'); } catch { saved = null; }
+    if (saved && (await tryUnlock(saved.id, saved.pass))) { showLocked(false); renderStatus(); return; }
+    showLocked(true);
+    el.drawTitle.textContent = 'ログインしてください';
+  }
+  async function onLogin() {
+    const id = el.loginId.value, pass = el.loginPass.value;
+    el.loginBtn.disabled = true; el.loginMsg.hidden = true;
+    const ok = await tryUnlock(id, pass);
+    el.loginBtn.disabled = false;
+    if (!ok) { el.loginMsg.textContent = 'IDまたはパスワードが違います。'; el.loginMsg.hidden = false; el.loginPass.value = ''; el.loginPass.focus(); return; }
+    try { const store = el.loginRemember.checked ? localStorage : sessionStorage; store.setItem(CRED_KEY, JSON.stringify(cred)); } catch { /* ignore */ }
+    showLocked(false); renderStatus(); el.input.focus();
+  }
+  function logout() {
+    try { localStorage.removeItem(CRED_KEY); sessionStorage.removeItem(CRED_KEY); } catch { /* ignore */ }
+    location.reload();
+  }
 
   function lookup(number) {
     const prizes = byNumber.get(number) || [];
@@ -497,11 +560,22 @@
 </html>
 `;
   }
-  async function publishDraw(newDraw, doneText) {
+  async function publishDraw({ title, entries }, doneText) {
     if (!artifactApi) { admMsg('この画面からは公開できません。claude.ai で開いた自分のページからお試しください。', 'err'); return; }
+    const protect = el.admProtect.checked;
+    const id = el.admId.value.trim(), pass = el.admPass.value;
+    if (protect && (!id || !pass)) { admMsg('IDとパスワードを入力してください（保護しない場合はチェックを外してください）。', 'err'); return; }
     el.admPublish.disabled = true; el.admClear.disabled = true;
     admMsg('公開しています…', 'ok');
     try {
+      let newDraw;
+      if (protect) {
+        const c = await encryptEntries(entries, id, pass);
+        newDraw = { title, updatedAt: new Date().toISOString(), locked: true, count: entries.length, salt: c.salt, iv: c.iv, cipher: c.cipher };
+        try { const store = localStorage.getItem(CRED_KEY) ? localStorage : sessionStorage; store.setItem(CRED_KEY, JSON.stringify({ id, pass })); } catch { /* ignore */ }
+      } else {
+        newDraw = { title, updatedAt: new Date().toISOString(), locked: false, entries };
+      }
       try { sessionStorage.setItem('fukubiki.published', doneText); } catch { /* ignore */ }
       await artifactApi.publish(buildPageHtml(newDraw));
       admMsg(doneText, 'ok');
@@ -534,12 +608,15 @@
     el.admPublish.addEventListener('click', () => {
       if (!pending || !pending.entries.length) return;
       if (!confirm(`現在の当選リストを ${pending.entries.length} 件の新しい内容で置き換えて公開します。よろしいですか？`)) return;
-      publishDraw({ title: el.admTitle.value.trim() || `${new Date().getFullYear()}年 当選発表`, updatedAt: new Date().toISOString(), entries: pending.entries }, `公開しました（${pending.entries.length}件）。ページが更新されます。`);
+      publishDraw({ title: el.admTitle.value.trim() || `${new Date().getFullYear()}年 当選発表`, entries: pending.entries }, `公開しました（${pending.entries.length}件）。ページが更新されます。`);
     });
     el.admClear.addEventListener('click', () => {
       if (!confirm('登録されている当選番号を消して「未登録」状態で公開します。よろしいですか？')) return;
-      publishDraw({ title: '', updatedAt: new Date().toISOString(), entries: [] }, '登録を消して公開しました。');
+      publishDraw({ title: '', entries: [] }, '登録を消して公開しました。');
     });
+    el.admLogout.addEventListener('click', logout);
+    el.admProtect.addEventListener('change', () => { el.admCred.hidden = !el.admProtect.checked; });
+    el.adminOpen.addEventListener('click', () => { if (cred) { if (!el.admId.value) el.admId.value = cred.id; if (!el.admPass.value) el.admPass.value = cred.pass; } el.admProtect.checked = locked || !!cred; el.admCred.hidden = !el.admProtect.checked; });
     try { const m = sessionStorage.getItem('fukubiki.published'); if (m) { sessionStorage.removeItem('fukubiki.published'); el.admin.hidden = false; admMsg(m, 'ok'); } } catch { /* ignore */ }
     const use = window.claude && typeof window.claude.use === 'function' ? window.claude.use('artifact') : Promise.resolve(null);
     use.then((api) => {
@@ -550,7 +627,9 @@
   }
 
   // ---------------- 初期化 ----------------
-  renderStatus(); renderHistory(); sound.init(); initAdmin();
+  renderHistory(); sound.init(); initAdmin(); initLock();
+  el.loginBtn.addEventListener('click', onLogin);
+  el.loginPass.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); onLogin(); } });
   el.input.addEventListener('input', onInput);
   el.input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); startCheck(); } });
   el.clear.addEventListener('click', () => { el.input.value = ''; onInput(); el.input.focus(); });
