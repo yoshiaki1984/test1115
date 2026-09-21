@@ -1,0 +1,10 @@
+{
+  "name": "福引 当選番号チェック",
+  "short_name": "福引チェック",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#12081f",
+  "theme_color": "#12081f",
+  "lang": "ja",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

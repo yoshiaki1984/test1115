@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+  <meta name="theme-color" content="#12081f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="福引チェック">
+  <title>福引 当選番号チェック</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon.svg">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="top">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">🎯</span>
+      <div>
+        <h1>福引 当選番号チェック</h1>
+        <p id="draw-title" class="draw-title">読み込み中…</p>
+      </div>
+    </div>
+    <button id="sound-toggle" class="icon-btn" type="button" aria-label="効果音の切り替え" aria-pressed="true">🔊</button>
+  </header>
+
+  <main class="main">
+    <section class="card entry-card">
+      <label for="number" class="entry-label">あなたの福引番号</label>
+      <div class="number-field">
+        <input id="number" class="number-input" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" enterkeyhint="go" maxlength="6" placeholder="0000" aria-describedby="entry-hint">
+        <button id="clear" class="clear-btn" type="button" aria-label="入力をクリア" hidden>×</button>
+      </div>
+      <p id="entry-hint" class="hint">福引券の番号を入力して、照合ボタンを押してください</p>
+      <button id="check" class="primary-btn" type="button" disabled>
+        <span class="btn-label">運命の照合スタート</span>
+        <span class="btn-sub">ドキドキ…</span>
+      </button>
+      <p id="not-registered" class="notice" hidden>当選番号はまだ登録されていません。発表までお待ちください。</p>
+    </section>
+
+    <section class="card stats-card" id="stats-card" hidden>
+      <div class="stat"><span class="stat-num" id="stat-total">-</span><span class="stat-label">当選本数</span></div>
+      <div class="stat"><span class="stat-num" id="stat-grand">-</span><span class="stat-label">特賞</span></div>
+      <div class="stat"><span class="stat-num" id="stat-upper">-</span><span class="stat-label">上位賞</span></div>
+    </section>
+
+    <section class="history" id="history" hidden>
+      <h2 class="history-title">最近チェックした番号</h2>
+      <ul id="history-list" class="history-list"></ul>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <a href="/admin" class="foot-link">管理者用</a>
+  </footer>
+
+  <!-- 演出ステージ（全画面） -->
+  <div id="stage" class="stage" hidden aria-live="polite">
+    <div class="stage-inner">
+      <div id="stage-phase" class="stage-phase">
+        <p id="stage-msg" class="stage-msg">照合開始…</p>
+        <div id="reel" class="reel" aria-hidden="true"></div>
+        <div class="scanner" id="scanner" hidden><div class="scanner-bar"></div></div>
+        <p id="stage-sub" class="stage-sub"></p>
+        <div class="reach-banner" id="reach-banner" hidden><span>激アツ!!</span></div>
+      </div>
+
+      <div id="result" class="result" hidden>
+        <p id="result-badge" class="result-badge"></p>
+        <h2 id="result-title" class="result-title"></h2>
+        <p id="result-number" class="result-number"></p>
+        <div id="prize-card" class="prize-card" hidden>
+          <p class="prize-label">当選商品</p>
+          <p id="prize-name" class="prize-name"></p>
+        </div>
+        <p id="result-note" class="result-note"></p>
+        <p id="near-miss" class="near-miss" hidden></p>
+        <button id="again" class="primary-btn again-btn" type="button">もう一度チェックする</button>
+      </div>
+    </div>
+    <button id="skip" class="skip-btn" type="button" hidden>結果を見る ≫</button>
+    <canvas id="fx" class="fx" aria-hidden="true"></canvas>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

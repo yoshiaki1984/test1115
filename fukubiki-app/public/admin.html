@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#12081f">
+  <title>管理画面 - 福引 当選番号チェック</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .admin-main { position: relative; z-index: 1; padding: 12px 16px 40px; max-width: 640px; margin: 0 auto; }
+    .admin-main h2 { font-size: 16px; margin: 0 0 12px; }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; font-size: 13px; color: var(--muted); }
+    .field input[type="text"], .field input[type="password"], .field textarea {
+      font: inherit; font-size: 16px; padding: 12px; border-radius: 12px; border: 1px solid var(--card-border);
+      background: rgba(0, 0, 0, 0.35); color: var(--text); width: 100%;
+    }
+    .field textarea { min-height: 120px; font-family: ui-monospace, monospace; font-size: 13px; }
+    .file-btn { display: block; padding: 22px 12px; border: 2px dashed rgba(245, 197, 66, 0.5); border-radius: 14px; text-align: center; color: var(--gold-2); font-weight: 700; cursor: pointer; }
+    .file-btn input { display: none; }
+    .btn { border: none; border-radius: 12px; padding: 12px 16px; font-weight: 700; font-size: 15px; cursor: pointer; color: #fff; background: rgba(255, 255, 255, 0.14); }
+    .btn.primary { background: linear-gradient(135deg, #ff3b5c, #ff8a3d 55%, #f5c542); }
+    .btn.danger { background: rgba(255, 59, 92, 0.25); color: #ffb4c2; }
+    .btn:disabled { opacity: 0.45; cursor: default; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .row .btn { flex: 1; }
+    .status-line { font-size: 13px; color: var(--muted); margin: 4px 0; }
+    .status-line strong { color: var(--text); }
+    .msg { font-size: 13px; padding: 10px 12px; border-radius: 12px; margin: 10px 0; }
+    .msg.ok { background: rgba(53, 224, 161, 0.14); color: #a8f5d8; }
+    .msg.err { background: rgba(255, 59, 92, 0.14); color: #ffb4c2; }
+    .msg.warn { background: rgba(245, 197, 66, 0.14); color: var(--gold-2); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--card-border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: 12px; }
+    td.num { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+    .tier { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 999px; margin-left: 4px; vertical-align: middle; }
+    .tier.grand { background: #ff3b5c; color: #fff; } .tier.upper { background: var(--gold); color: #3a2600; } .tier.regular { background: rgba(255,255,255,0.15); }
+    .table-wrap { max-height: 60vh; overflow: auto; border-radius: 12px; border: 1px solid var(--card-border); }
+    details summary { cursor: pointer; color: var(--gold-2); font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+    .back { color: var(--muted); font-size: 13px; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+  <header class="top">
+    <div class="brand"><span class="brand-icon" aria-hidden="true">🛠️</span><div><h1>管理画面</h1><p class="draw-title">当選番号の登録・確認</p></div></div>
+    <a class="back" href="/">← アプリへ</a>
+  </header>
+
+  <main class="admin-main">
+    <section class="card" id="login-card">
+      <h2>ログイン</h2>
+      <form id="login-form">
+        <label class="field">管理パスワード<input id="password" type="password" autocomplete="current-password" required></label>
+        <button class="btn primary" type="submit" style="width:100%">ログイン</button>
+      </form>
+      <div id="login-msg"></div>
+    </section>
+
+    <div id="dashboard" hidden>
+      <section class="card">
+        <h2>現在の登録状況</h2>
+        <div id="status-box"></div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn" id="refresh-btn" type="button">再読み込み</button>
+          <button class="btn danger" id="delete-btn" type="button">登録を削除</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>当選発表PDFを登録</h2>
+        <p class="status-line">昨年と同じレイアウト（「当選番号」「品名」の2列表）のPDFを読み込みます。登録すると現在のリストは置き換わります。</p>
+        <label class="field">タイトル（任意）<input id="title" type="text" placeholder="例: 2026年 当選発表"></label>
+        <label class="file-btn"><input id="pdf-file" type="file" accept="application/pdf,.pdf"><span id="file-label">📄 PDFファイルを選択</span></label>
+        <div class="row" style="margin-top:12px">
+          <button class="btn" id="preview-btn" type="button" disabled>解析プレビュー</button>
+          <button class="btn primary" id="import-btn" type="button" disabled>この内容で登録</button>
+        </div>
+        <div id="import-msg"></div>
+        <div id="preview-box"></div>
+      </section>
+
+      <section class="card">
+        <details>
+          <summary>テキストから登録（PDFが読めない場合の手入力）</summary>
+          <p class="status-line">1行に「番号,品名」または「番号 品名」の形式で貼り付けてください。【特賞】を含む行は特賞、先頭の順不同ブロックは上位賞として扱います。</p>
+          <label class="field">当選リスト<textarea id="text-input" placeholder="2204,【特賞】トヨタ クラウンクロスオーバー&#10;2,Dyson：Supersonicヘアドライヤー"></textarea></label>
+          <div class="row">
+            <button class="btn" id="text-preview-btn" type="button">解析プレビュー</button>
+            <button class="btn primary" id="text-import-btn" type="button">登録</button>
+          </div>
+          <div id="text-msg"></div>
+        </details>
+      </section>
+
+      <section class="card">
+        <h2>登録済み当選番号一覧</h2>
+        <label class="field">絞り込み<input id="filter" type="text" inputmode="numeric" placeholder="番号または品名で検索"></label>
+        <div class="table-wrap"><table><thead><tr><th>番号</th><th>品名</th></tr></thead><tbody id="winners-body"></tbody></table></div>
+        <p class="status-line" id="winners-count"></p>
+      </section>
+    </div>
+  </main>
+  <script src="/admin.js"></script>
+</body>
+</html>

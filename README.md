@@ -236,3 +236,10 @@ const data = {
 const result = processUserData(data, { formatName: 'capitalize' });
 console.log(result);
 ```
+
+---
+
+## 福引 当選番号チェックアプリ
+
+`fukubiki-app/` に、当選発表PDFをDB登録して番号を照合するスマホ向けウェブアプリがあります。
+使い方は [fukubiki-app/README.md](fukubiki-app/README.md) を参照してください。

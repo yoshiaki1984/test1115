@@ -1,0 +1,21 @@
+{
+  "name": "fukubiki-app",
+  "version": "1.0.0",
+  "description": "福引 当選番号照合アプリ（スマホ最適化）",
+  "private": true,
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --no-warnings=ExperimentalWarning server.js",
+    "dev": "node --no-warnings=ExperimentalWarning --watch server.js",
+    "import": "node --no-warnings=ExperimentalWarning scripts/import-pdf.js",
+    "test": "node --no-warnings=ExperimentalWarning --test \"test/**/*.test.js\""
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "pdfjs-dist": "^4.10.38"
+  }
+}
