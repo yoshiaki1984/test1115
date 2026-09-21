@@ -91,16 +91,16 @@
     document.body.style.overflow = ''; el.input.value = ''; onInput(); el.input.focus();
   }
   async function playSuspense(numberText, result) {
-    setMsg('照合開始…'); buildReel(numberText.length); sound.tickStart();
+    setMsg('照合開始…'); buildReel(numberText.length); sound.spinStart();
     if (!(await wait(700))) return;
     const digits = numberText.split('');
     for (let i = 0; i < digits.length; i++) {
       if (!(await wait(420 + i * 160 + (i === digits.length - 1 ? 500 : 0)))) return;
       lockDigit(i, digits[i]); vibrate(20); sound.lock(i);
     }
-    sound.tickStop();
+    sound.cut();
     if (!(await wait(500))) return;
-    el.scan.hidden = false;
+    el.scan.hidden = false; sound.scan();
     for (const m of ['当選番号データベースと照合中…', '…', '……ん？', '反応あり……？']) { setMsg(m); if (!(await wait(rand(700, 1100)))) return; }
     const tier = result.hit ? result.prizes[0].tier : null;
     let reach;
@@ -110,27 +110,27 @@
     else reach = Math.random() < 0.3 ? 'hot' : Math.random() < 0.5 ? 'warm' : 'none';
     el.scan.hidden = true;
     if (reach === 'none') {
-      setMsg('判定中……'); el.sub.textContent = pick(['心の準備はいいですか？', '深呼吸して……', '結果は……']); sound.heartbeat(3);
+      setMsg('判定中……'); el.sub.textContent = pick(['心の準備はいいですか？', '深呼吸して……', '結果は……']); sound.tension(1.8, false);
       if (!(await wait(1800))) return;
     } else if (reach === 'warm') {
-      setMsg('…おや？'); el.sub.textContent = '何か引っかかりました……'; sound.heartbeat(4); vibrate([40, 80, 40]);
+      setMsg('…おや？'); el.sub.textContent = '何か引っかかりました……'; sound.tension(2.0, true); vibrate([40, 80, 40]);
       if (!(await wait(2000))) return;
     } else if (reach === 'hot') {
       setMsg('！！！'); el.stage.classList.add('reach', 'shake'); el.banner.hidden = false; el.banner.firstElementChild.textContent = '激アツ!!';
-      sound.siren(2.6); vibrate([60, 60, 60, 60, 120]);
+      sound.hot(2.6, 1); vibrate([60, 60, 60, 60, 120]);
       if (!(await wait(2600))) return;
       el.banner.hidden = true; el.stage.classList.remove('reach', 'shake');
-      setMsg('運命の結果は……'); el.sub.textContent = ''; sound.heartbeat(3);
+      setMsg('運命の結果は……'); el.sub.textContent = ''; sound.tension(1.8, true);
       if (!(await wait(1800))) return;
     } else {
       setMsg('！？！？'); el.stage.classList.add('reach'); el.banner.hidden = false; el.banner.firstElementChild.textContent = '激アツ!!';
-      sound.siren(2); vibrate([80, 60, 80, 60, 160]);
+      sound.hot(2, 1); vibrate([80, 60, 80, 60, 160]);
       if (!(await wait(2000))) return;
       el.stage.classList.remove('reach'); el.stage.classList.add('super', 'shake'); el.banner.firstElementChild.textContent = '超激アツ!!!';
-      sound.siren(2.8, 1.5); fx.sparkle(60);
+      sound.hot(2.8, 2); fx.sparkle(60);
       if (!(await wait(2800))) return;
       el.banner.hidden = true; el.stage.classList.remove('super', 'shake');
-      setMsg('これは……まさか……'); sound.heartbeat(4);
+      setMsg('これは……まさか……'); sound.tension(2.4, true);
       if (!(await wait(2400))) return;
     }
   }
@@ -193,18 +193,36 @@
     }
   }
 
-  // ---------------- 効果音 ----------------
+  // ---------------- 効果音（Web Audio 合成・パチスロ風） ----------------
   const sound = {
-    ctx: null, master: null, media: null, enabled: true, nodes: [], tickTimer: null,
+    ctx: null, master: null, comp: null, reverb: null, delay: null, noiseBuf: null, media: null,
+    enabled: true, nodes: [], timers: [],
     init() { try { this.enabled = localStorage.getItem(SOUND_KEY) !== 'off'; } catch { /* ignore */ } this.render(); },
     render() { el.soundToggle.textContent = this.enabled ? '🔊' : '🔇'; el.soundToggle.setAttribute('aria-pressed', String(this.enabled)); },
-    toggle() { this.enabled = !this.enabled; try { localStorage.setItem(SOUND_KEY, this.enabled ? 'on' : 'off'); } catch { /* ignore */ } if (!this.enabled) this.stopAll(); this.render(); this.unlock(); },
+    toggle() { this.enabled = !this.enabled; try { localStorage.setItem(SOUND_KEY, this.enabled ? 'on' : 'off'); } catch { /* ignore */ } if (!this.enabled) this.stopAll(); this.render(); this.unlock(); if (this.enabled) this.coin(0, 1); },
     unlock() {
       if (!this.enabled) return;
       try {
         if (!this.ctx) {
-          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-          this.master = this.ctx.createGain(); this.master.gain.value = 1.6; this.master.connect(this.ctx.destination);
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          this.ctx = ctx;
+          this.comp = ctx.createDynamicsCompressor();
+          this.comp.threshold.value = -14; this.comp.knee.value = 12; this.comp.ratio.value = 8; this.comp.attack.value = 0.003; this.comp.release.value = 0.2;
+          this.master = ctx.createGain(); this.master.gain.value = 1.0;
+          this.master.connect(this.comp); this.comp.connect(ctx.destination);
+          // リバーブ（減衰ノイズのインパルス）
+          const len = Math.floor(ctx.sampleRate * 1.8); const ir = ctx.createBuffer(2, len, ctx.sampleRate);
+          for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
+          this.reverb = ctx.createConvolver(); this.reverb.buffer = ir;
+          const rg = ctx.createGain(); rg.gain.value = 0.35; this.reverb.connect(rg); rg.connect(this.master);
+          // ディレイ（エコー）
+          this.delay = ctx.createDelay(1); this.delay.delayTime.value = 0.18;
+          const fb = ctx.createGain(); fb.gain.value = 0.35; const dg = ctx.createGain(); dg.gain.value = 0.3;
+          this.delay.connect(fb); fb.connect(this.delay); this.delay.connect(dg); dg.connect(this.master);
+          // ノイズ
+          const nb = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate); const nd = nb.getChannelData(0);
+          for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+          this.noiseBuf = nb;
         }
         if (this.ctx.state === 'suspended') this.ctx.resume();
       } catch { this.ctx = null; }
@@ -216,27 +234,147 @@
       } catch { /* ignore */ }
       setTimeout(() => { el.soundHint.hidden = !(this.enabled && (!this.ctx || this.ctx.state !== 'running')); }, 600);
     },
-    tone({ type = 'sine', freq = 440, freqEnd = null, dur = 0.2, gain = 0.2, at = 0 }) {
+    get now() { return this.ctx ? this.ctx.currentTime : 0; },
+    track(n) { this.nodes.push(n); n.onended = () => { const i = this.nodes.indexOf(n); if (i >= 0) this.nodes.splice(i, 1); }; return n; },
+    out(g, { reverb = 0, delay = 0 } = {}) {
+      g.connect(this.master);
+      if (reverb > 0) { const s = this.ctx.createGain(); s.gain.value = reverb; g.connect(s); s.connect(this.reverb); }
+      if (delay > 0) { const s = this.ctx.createGain(); s.gain.value = delay; g.connect(s); s.connect(this.delay); }
+    },
+    /** 基本オシレータ音。at は現在時刻からの秒。 */
+    tone({ type = 'sine', freq = 440, freqEnd = null, dur = 0.2, gain = 0.2, at = 0, attack = 0.01, detune = 0, reverb = 0, delay = 0, lp = 0, vib = 0 }) {
       if (!this.enabled || !this.ctx) return;
-      const t0 = this.ctx.currentTime + at, o = this.ctx.createOscillator(), g = this.ctx.createGain();
-      o.type = type; o.frequency.setValueAtTime(freq, t0);
+      const t0 = this.now + at, o = this.ctx.createOscillator(), g = this.ctx.createGain();
+      o.type = type; o.detune.value = detune; o.frequency.setValueAtTime(freq, t0);
       if (freqEnd) o.frequency.exponentialRampToValueAtTime(freqEnd, t0 + dur);
-      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(gain, t0 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-      o.connect(g); g.connect(this.master || this.ctx.destination); o.start(t0); o.stop(t0 + dur + 0.05);
-      this.nodes.push(o); o.onended = () => { this.nodes = this.nodes.filter((n) => n !== o); };
+      if (vib > 0) { const l = this.ctx.createOscillator(), lg = this.ctx.createGain(); l.frequency.value = 6; lg.gain.value = vib; l.connect(lg); lg.connect(o.frequency); l.start(t0); l.stop(t0 + dur + 0.1); this.track(l); }
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(gain, t0 + attack); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      let last = o;
+      if (lp > 0) { const f = this.ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.setValueAtTime(lp, t0); f.frequency.exponentialRampToValueAtTime(Math.max(200, lp / 6), t0 + dur); f.Q.value = 4; o.connect(f); last = f; }
+      last.connect(g); this.out(g, { reverb, delay });
+      o.start(t0); o.stop(t0 + dur + 0.05); this.track(o);
     },
-    tickStart() { this.tickStop(); let period = 70; const loop = () => { this.tone({ type: 'square', freq: 1200, dur: 0.03, gain: 0.09 }); period = Math.min(period + 1.5, 140); this.tickTimer = setTimeout(loop, period); }; loop(); },
-    tickStop() { if (this.tickTimer) { clearTimeout(this.tickTimer); this.tickTimer = null; } },
-    lock(i) { this.tone({ type: 'triangle', freq: 660 + i * 110, dur: 0.15, gain: 0.25 }); },
-    heartbeat(n) { for (let i = 0; i < n; i++) { this.tone({ freq: 70, freqEnd: 45, dur: 0.18, gain: 0.5, at: i * 0.6 }); this.tone({ freq: 60, freqEnd: 40, dur: 0.15, gain: 0.35, at: i * 0.6 + 0.22 }); } },
-    siren(sec, pitch = 1) { const n = Math.floor(sec / 0.3); for (let i = 0; i < n; i++) { this.tone({ type: 'sawtooth', freq: 500 * pitch, freqEnd: 1000 * pitch, dur: 0.15, gain: 0.12, at: i * 0.3 }); this.tone({ type: 'sawtooth', freq: 1000 * pitch, freqEnd: 500 * pitch, dur: 0.15, gain: 0.12, at: i * 0.3 + 0.15 }); } },
-    fanfare(tier) {
-      const notes = tier === 'grand' ? [523, 659, 784, 1047, 784, 1047, 1319, 1568] : tier === 'upper' ? [523, 659, 784, 1047, 1319] : [523, 659, 784, 1047];
-      notes.forEach((f, i) => { this.tone({ type: 'triangle', freq: f, dur: 0.22, gain: 0.3, at: i * 0.13 }); this.tone({ type: 'square', freq: f / 2, dur: 0.22, gain: 0.08, at: i * 0.13 }); });
-      const end = notes.length * 0.13; [523, 659, 784, 1047].forEach((f) => this.tone({ type: 'triangle', freq: f, dur: 1.2, gain: 0.18, at: end }));
+    /** ノイズ音（スネア・シンバル・ライザー等） */
+    noise({ dur = 0.2, gain = 0.2, at = 0, hp = 1000, hpEnd = null, bp = 0, reverb = 0, attack = 0.005 }) {
+      if (!this.enabled || !this.ctx) return;
+      const t0 = this.now + at, s = this.ctx.createBufferSource(); s.buffer = this.noiseBuf; s.loop = true;
+      const f = this.ctx.createBiquadFilter(); f.type = bp ? 'bandpass' : 'highpass'; f.frequency.setValueAtTime(bp || hp, t0); f.Q.value = bp ? 1.2 : 0.7;
+      if (hpEnd) f.frequency.exponentialRampToValueAtTime(hpEnd, t0 + dur);
+      const g = this.ctx.createGain(); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(gain, t0 + attack); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      s.connect(f); f.connect(g); this.out(g, { reverb });
+      s.start(t0); s.stop(t0 + dur + 0.05); this.track(s);
     },
-    lose() { this.tone({ freq: 330, freqEnd: 250, dur: 0.35, gain: 0.3 }); this.tone({ freq: 250, freqEnd: 180, dur: 0.6, gain: 0.3, at: 0.35 }); },
-    stopAll() { this.tickStop(); for (const n of this.nodes) { try { n.stop(); } catch { /* ignore */ } } this.nodes = []; },
+    kick(at, gain = 0.9) { this.tone({ freq: 160, freqEnd: 42, dur: 0.22, gain, at, attack: 0.002 }); this.noise({ dur: 0.03, gain: 0.25, at, hp: 3000 }); },
+    snare(at, gain = 0.5) { this.noise({ dur: 0.14, gain, at, hp: 1500, reverb: 0.4 }); this.tone({ type: 'triangle', freq: 220, freqEnd: 120, dur: 0.1, gain: gain * 0.6, at }); },
+    hat(at, gain = 0.18, dur = 0.04) { this.noise({ dur, gain, at, hp: 7000 }); },
+    crash(at, gain = 0.6) { this.noise({ dur: 1.6, gain, at, hp: 4000, hpEnd: 2500, reverb: 0.8, attack: 0.002 }); this.noise({ dur: 0.6, gain: gain * 0.6, at, bp: 6000 }); },
+    coin(at, n = 1) { for (let i = 0; i < n; i++) { const f = 1568 + Math.random() * 600; this.tone({ type: 'square', freq: f, dur: 0.08, gain: 0.12, at: at + i * 0.07 }); this.tone({ type: 'square', freq: f * 1.5, dur: 0.3, gain: 0.12, at: at + i * 0.07 + 0.06, reverb: 0.3 }); } },
+    stab(at, base = 523, gain = 0.5) { // 「ジャキーン」金属的スタブ
+      for (const r of [1, 1.5, 2, 3]) { this.tone({ type: 'sawtooth', freq: base * r, dur: 0.5, gain: gain * 0.25, at, detune: 8, lp: 6000, reverb: 0.7, delay: 0.5 }); this.tone({ type: 'square', freq: base * r, dur: 0.5, gain: gain * 0.15, at, detune: -8, lp: 5000 }); }
+      this.noise({ dur: 0.25, gain: gain * 0.5, at, hp: 5000, reverb: 0.6 });
+    },
+    brass(freq, dur, at, gain = 0.5) { // ブラス風（ノコギリ波×3をデチューン＋ローパス）
+      for (const d of [-10, 0, 10]) this.tone({ type: 'sawtooth', freq, dur, gain: gain / 3, at, detune: d, attack: 0.03, lp: 4500, reverb: 0.5 });
+      this.tone({ type: 'square', freq: freq / 2, dur, gain: gain * 0.25, at, attack: 0.03, lp: 1200 });
+    },
+    /** テンポ付きビート。秒数分をまとめてスケジュール。 */
+    beat({ bpm, sec, at = 0, kick = true, hats = true, snare = false, bass = 0, accel = 0 }) {
+      let t = at, i = 0;
+      while (t < at + sec) {
+        const spb = 60 / (bpm + accel * (t - at));
+        if (kick && i % 2 === 0) this.kick(t, 0.8);
+        if (snare && i % 4 === 2) this.snare(t, 0.4);
+        if (hats) this.hat(t, i % 2 ? 0.12 : 0.2);
+        if (bass && i % 2 === 0) this.tone({ type: 'sawtooth', freq: bass, dur: spb * 0.9, gain: 0.35, at: t, lp: 700 });
+        t += spb / 2; i++;
+      }
+    },
+    // ---- フェーズ別 ----
+    spinStart() { // リール回転: ビート + 加速するカチカチ
+      this.cut();
+      this.beat({ bpm: 128, sec: 6, kick: true, hats: true, bass: 55, accel: 4 });
+      let t = 0, period = 0.055;
+      while (t < 6) { this.tone({ type: 'square', freq: 1400 + Math.random() * 400, dur: 0.03, gain: 0.14, at: t }); t += period; period = Math.min(period + 0.0009, 0.13); }
+      this.noise({ dur: 6, gain: 0.05, at: 0, hp: 400, hpEnd: 6000 });
+    },
+    lock(i) { // 桁確定「ガチン！」
+      this.kick(0, 1); this.noise({ dur: 0.12, gain: 0.5, at: 0, hp: 2500, reverb: 0.5 });
+      this.tone({ type: 'triangle', freq: 880 + i * 220, dur: 0.35, gain: 0.5, at: 0, reverb: 0.5 });
+      this.tone({ type: 'square', freq: 1760 + i * 440, dur: 0.18, gain: 0.2, at: 0.02, delay: 0.4 });
+    },
+    scan() { // データベース照合: 速いビート + レーザー + ピピッ
+      this.cut();
+      this.beat({ bpm: 150, sec: 6, kick: true, hats: true, snare: true, bass: 62 });
+      for (let t = 0; t < 6; t += 0.8) { this.tone({ type: 'sawtooth', freq: 300, freqEnd: 3000, dur: 0.35, gain: 0.18, at: t, delay: 0.6, lp: 8000 }); this.tone({ type: 'square', freq: 2200, dur: 0.05, gain: 0.15, at: t + 0.4 }); this.tone({ type: 'square', freq: 2600, dur: 0.05, gain: 0.15, at: t + 0.5 }); }
+    },
+    tension(sec, strong) { // 判定中: 心音 + 上昇ドローン + 末尾でスネアロール
+      this.cut();
+      for (let t = 0; t < sec; t += 0.62) { this.tone({ freq: 75, freqEnd: 42, dur: 0.2, gain: 0.9, at: t, attack: 0.003 }); this.tone({ freq: 65, freqEnd: 38, dur: 0.16, gain: 0.6, at: t + 0.24, attack: 0.003 }); }
+      this.tone({ type: 'sawtooth', freq: 110, freqEnd: strong ? 330 : 220, dur: sec, gain: 0.22, at: 0, lp: 1500, attack: 0.5 });
+      if (strong) this.tone({ type: 'sine', freq: 1200, freqEnd: 2400, dur: sec, gain: 0.08, at: 0, vib: 30 });
+      this.drumroll(sec - 1.2, 1.2);
+    },
+    hot(sec, level) { // 激アツ: サイレン + ピピピピ + 4つ打ち + ライザー
+      this.cut();
+      const pitch = level === 2 ? 1.5 : 1;
+      this.beat({ bpm: level === 2 ? 175 : 160, sec, kick: true, hats: true, snare: true, bass: level === 2 ? 82 : 65 });
+      for (let t = 0; t < sec; t += 0.36) { this.tone({ type: 'sawtooth', freq: 520 * pitch, freqEnd: 1040 * pitch, dur: 0.18, gain: 0.2, at: t, lp: 6000 }); this.tone({ type: 'sawtooth', freq: 1040 * pitch, freqEnd: 520 * pitch, dur: 0.18, gain: 0.2, at: t + 0.18, lp: 6000 }); }
+      for (let t = 0; t < sec; t += 0.09) this.tone({ type: 'square', freq: (t % 0.36 < 0.18 ? 3100 : 2600) * pitch, dur: 0.045, gain: 0.13, at: t });
+      this.noise({ dur: sec, gain: 0.18, at: 0, hp: 300, hpEnd: 9000, attack: sec * 0.7 });
+      this.stab(0, 523 * pitch, 0.7); this.stab(sec * 0.5, 659 * pitch, 0.7);
+      if (level === 2) { // 超激アツ: アルペジオ + ベースドロップ + クラッシュ
+        const arp = [523, 659, 784, 1047, 1319, 1568, 2093, 2637];
+        for (let t = 0, i = 0; t < sec; t += 0.075, i++) this.tone({ type: 'square', freq: arp[i % arp.length] * (1 + Math.floor(i / arp.length) % 2), dur: 0.09, gain: 0.14, at: t, delay: 0.4 });
+        for (let t = 0; t < sec; t += 1.2) { this.tone({ freq: 220, freqEnd: 28, dur: 0.8, gain: 1, at: t, attack: 0.005 }); this.crash(t, 0.5); }
+      }
+    },
+    drumroll(at, sec) { // スネアロール（加速・クレッシェンド）
+      let t = 0, step = 0.07, k = 0;
+      while (t < sec) { this.snare(at + t, 0.15 + 0.5 * (t / sec)); t += step; step = Math.max(0.03, step - 0.0025); k++; }
+      this.noise({ dur: sec, gain: 0.25, at, hp: 800, hpEnd: 8000, attack: sec * 0.9 });
+    },
+    fanfare(tier) { // 当選ファンファーレ
+      this.cut();
+      this.crash(0, 0.8); this.kick(0, 1);
+      const short = 0.16, long = 0.6;
+      const seq = tier === 'grand'
+        ? [[784, short], [784, short], [784, short], [1047, long], [988, short], [1047, short], [1175, long], [1047, short], [1175, short], [1319, long], [1568, 1.4]]
+        : tier === 'upper'
+          ? [[784, short], [784, short], [784, short], [1047, long], [988, short], [1047, short], [1319, 1.1]]
+          : [[784, short], [784, short], [784, short], [1047, 0.9]];
+      let t = 0.05;
+      for (const [f, d] of seq) { this.brass(f, d, t, 0.6); this.brass(f / 2, d, t, 0.3); this.hat(t, 0.15); t += d + 0.03; }
+      // 最後にコードを鳴らす
+      const end = t;
+      for (const f of [523, 659, 784, 1047]) { this.brass(f, tier === 'grand' ? 2.6 : 1.8, end, 0.45); }
+      this.crash(end, 0.7); this.kick(end, 1);
+      // コインの雨
+      this.coin(0.2, tier === 'grand' ? 40 : tier === 'upper' ? 22 : 12);
+      if (tier === 'grand') {
+        for (let k = 0; k < 6; k++) { this.crash(end + 0.8 + k * 0.5, 0.35); this.coin(end + 1 + k * 0.5, 6); }
+        this.beat({ bpm: 140, sec: 4, at: end, kick: true, hats: true, snare: true, bass: 65 });
+        const arp = [1047, 1319, 1568, 2093];
+        for (let i = 0; i < 32; i++) this.tone({ type: 'triangle', freq: arp[i % 4], dur: 0.12, gain: 0.2, at: end + i * 0.11, delay: 0.5 });
+      } else if (tier === 'upper') {
+        this.beat({ bpm: 140, sec: 2, at: end, kick: true, hats: true, snare: true });
+      }
+    },
+    lose() { // 落選: トロンボーンの「ワウワウワウワァ〜」 + ずっこけ
+      this.cut();
+      const seq = [[440, 0.45], [415, 0.45], [392, 0.45], [370, 1.4]];
+      let t = 0;
+      for (const [f, d] of seq) { this.tone({ type: 'sawtooth', freq: f, freqEnd: f * 0.97, dur: d, gain: 0.45, at: t, lp: 1800, vib: 6, attack: 0.05, reverb: 0.4 }); this.tone({ type: 'sawtooth', freq: f / 2, dur: d, gain: 0.2, at: t, lp: 900, attack: 0.05 }); t += d + 0.08; }
+      this.tone({ type: 'sine', freq: 300, freqEnd: 60, dur: 0.6, gain: 0.5, at: t + 0.1 });
+      this.noise({ dur: 0.08, gain: 0.3, at: t + 0.1, hp: 2000 });
+    },
+    /** 予約済みの音をすべて止める（ctx は残す） */
+    cut() {
+      for (const t of this.timers) clearTimeout(t); this.timers = [];
+      const now = this.now;
+      for (const n of this.nodes) { try { n.onended = null; n.stop(now); } catch { /* ignore */ } }
+      this.nodes = [];
+    },
+    stopAll() { this.cut(); },
     stopMedia() { try { if (this.media) this.media.pause(); } catch { /* ignore */ } },
   };
 
