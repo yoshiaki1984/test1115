@@ -8,7 +8,7 @@
     history: $('history'), historyList: $('history-list'), soundToggle: $('sound-toggle'),
     stage: $('stage'), phase: $('phase'), msg: $('msg'), reel: $('reel'), scan: $('scan'), sub: $('sub'), banner: $('banner'),
     result: $('result'), badge: $('badge'), rtitle: $('rtitle'), rnum: $('rnum'), prize: $('prize'), prizeName: $('prize-name'),
-    note: $('note'), near: $('near'), again: $('again'), skip: $('skip'), fx: $('fx'),
+    note: $('note'), near: $('near'), soundHint: $('sound-hint'), again: $('again'), skip: $('skip'), fx: $('fx'),
     admin: $('admin'), adminOpen: $('admin-open'), admTitle: $('adm-title'), admFile: $('adm-file'), admFileLabel: $('adm-file-label'),
     admText: $('adm-text'), admParseText: $('adm-parse-text'), admMsg: $('adm-msg'), admPreview: $('adm-preview'), admEnv: $('adm-env'),
     admPublish: $('adm-publish'), admClear: $('adm-clear'), admClose: $('adm-close'),
@@ -17,6 +17,7 @@
   const HISTORY_KEY = 'fukubiki.history';
   const SOUND_KEY = 'fukubiki.sound';
   const NEAR_RANGE = 1;
+  const SILENT_WAV = 'data:audio/wav;base64,UklGRsQPAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YaAPAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA';
 
   // ---------------- データ ----------------
   let draw = { title: '', entries: [] };
@@ -86,7 +87,7 @@
     setTimeout(() => { if (running) el.skip.hidden = false; }, 1500);
   }
   function closeStage() {
-    fx.stop(); el.stage.hidden = true; el.stage.className = 'stage';
+    fx.stop(); sound.stopMedia(); el.stage.hidden = true; el.stage.className = 'stage';
     document.body.style.overflow = ''; el.input.value = ''; onInput(); el.input.focus();
   }
   async function playSuspense(numberText, result) {
@@ -194,21 +195,37 @@
 
   // ---------------- 効果音 ----------------
   const sound = {
-    ctx: null, enabled: true, nodes: [], tickTimer: null,
+    ctx: null, master: null, media: null, enabled: true, nodes: [], tickTimer: null,
     init() { try { this.enabled = localStorage.getItem(SOUND_KEY) !== 'off'; } catch { /* ignore */ } this.render(); },
     render() { el.soundToggle.textContent = this.enabled ? '🔊' : '🔇'; el.soundToggle.setAttribute('aria-pressed', String(this.enabled)); },
     toggle() { this.enabled = !this.enabled; try { localStorage.setItem(SOUND_KEY, this.enabled ? 'on' : 'off'); } catch { /* ignore */ } if (!this.enabled) this.stopAll(); this.render(); this.unlock(); },
-    unlock() { if (!this.enabled) return; try { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); if (this.ctx.state === 'suspended') this.ctx.resume(); } catch { this.ctx = null; } },
+    unlock() {
+      if (!this.enabled) return;
+      try {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+          this.master = this.ctx.createGain(); this.master.gain.value = 1.6; this.master.connect(this.ctx.destination);
+        }
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+      } catch { this.ctx = null; }
+      // iPhoneのサイレントスイッチ対策: 無音のメディアを再生して「再生」カテゴリに切り替える
+      try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch { /* ignore */ }
+      try {
+        if (!this.media) { const a = document.createElement('audio'); a.setAttribute('playsinline', ''); a.loop = true; a.src = SILENT_WAV; this.media = a; }
+        const p = this.media.play(); if (p && p.catch) p.catch(() => {});
+      } catch { /* ignore */ }
+      setTimeout(() => { el.soundHint.hidden = !(this.enabled && (!this.ctx || this.ctx.state !== 'running')); }, 600);
+    },
     tone({ type = 'sine', freq = 440, freqEnd = null, dur = 0.2, gain = 0.2, at = 0 }) {
       if (!this.enabled || !this.ctx) return;
       const t0 = this.ctx.currentTime + at, o = this.ctx.createOscillator(), g = this.ctx.createGain();
       o.type = type; o.frequency.setValueAtTime(freq, t0);
       if (freqEnd) o.frequency.exponentialRampToValueAtTime(freqEnd, t0 + dur);
       g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(gain, t0 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-      o.connect(g).connect(this.ctx.destination); o.start(t0); o.stop(t0 + dur + 0.05);
+      o.connect(g); g.connect(this.master || this.ctx.destination); o.start(t0); o.stop(t0 + dur + 0.05);
       this.nodes.push(o); o.onended = () => { this.nodes = this.nodes.filter((n) => n !== o); };
     },
-    tickStart() { this.tickStop(); let period = 70; const loop = () => { this.tone({ type: 'square', freq: 1200, dur: 0.03, gain: 0.05 }); period = Math.min(period + 1.5, 140); this.tickTimer = setTimeout(loop, period); }; loop(); },
+    tickStart() { this.tickStop(); let period = 70; const loop = () => { this.tone({ type: 'square', freq: 1200, dur: 0.03, gain: 0.09 }); period = Math.min(period + 1.5, 140); this.tickTimer = setTimeout(loop, period); }; loop(); },
     tickStop() { if (this.tickTimer) { clearTimeout(this.tickTimer); this.tickTimer = null; } },
     lock(i) { this.tone({ type: 'triangle', freq: 660 + i * 110, dur: 0.15, gain: 0.25 }); },
     heartbeat(n) { for (let i = 0; i < n; i++) { this.tone({ freq: 70, freqEnd: 45, dur: 0.18, gain: 0.5, at: i * 0.6 }); this.tone({ freq: 60, freqEnd: 40, dur: 0.15, gain: 0.35, at: i * 0.6 + 0.22 }); } },
@@ -220,6 +237,7 @@
     },
     lose() { this.tone({ freq: 330, freqEnd: 250, dur: 0.35, gain: 0.3 }); this.tone({ freq: 250, freqEnd: 180, dur: 0.6, gain: 0.3, at: 0.35 }); },
     stopAll() { this.tickStop(); for (const n of this.nodes) { try { n.stop(); } catch { /* ignore */ } } this.nodes = []; },
+    stopMedia() { try { if (this.media) this.media.pause(); } catch { /* ignore */ } },
   };
 
   // ---------------- 紙吹雪 ----------------
