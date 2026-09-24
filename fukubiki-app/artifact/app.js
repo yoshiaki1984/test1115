@@ -12,7 +12,8 @@
     admin: $('admin'), adminOpen: $('admin-open'), admTitle: $('adm-title'), admFile: $('adm-file'), admFileLabel: $('adm-file-label'),
     admText: $('adm-text'), admParseText: $('adm-parse-text'), admMsg: $('adm-msg'), admPreview: $('adm-preview'), admEnv: $('adm-env'),
     admPublish: $('adm-publish'), admClear: $('adm-clear'), admClose: $('adm-close'), admLogout: $('adm-logout'),
-    admProtect: $('adm-protect'), admCred: $('adm-cred'), admId: $('adm-id'), admPass: $('adm-pass'),
+    admProtect: $('adm-protect'), admCred: $('adm-cred'), admId: $('adm-id'), admPass: $('adm-pass'), admAid: $('adm-aid'), admApass: $('adm-apass'),
+    adminLogin: $('admin-login'), aloginId: $('alogin-id'), aloginPass: $('alogin-pass'), aloginBtn: $('alogin-btn'), aloginClose: $('alogin-close'), aloginMsg: $('alogin-msg'),
     login: $('login'), loginId: $('login-id'), loginPass: $('login-pass'), loginRemember: $('login-remember'), loginBtn: $('login-btn'), loginMsg: $('login-msg'), entry: $('entry'),
   };
   const TIER_LABEL = { grand: '特賞', upper: '上位賞', regular: '当選' };
@@ -46,16 +47,31 @@
     const km = await crypto.subtle.importKey('raw', enc.encode(`${String(id).trim()}\n${String(pass)}`), 'PBKDF2', false, ['deriveKey']);
     return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 120000, hash: 'SHA-256' }, km, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
   }
-  async function encryptEntries(entries, id, pass) {
+  async function encryptJson(obj, id, pass) {
     const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
     const key = await deriveKey(id, pass, salt);
-    const data = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(entries)));
+    const data = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(obj)));
     return { salt: b64(salt), iv: b64(iv), cipher: b64(data) };
   }
-  async function decryptEntries(d, id, pass) {
+  async function decryptJson(d, id, pass) {
     const key = await deriveKey(id, pass, unb64(d.salt));
     const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(d.iv) }, key, unb64(d.cipher));
     return JSON.parse(dec.decode(plain));
+  }
+  const encryptEntries = encryptJson, decryptEntries = decryptJson;
+  // 管理者: 管理者ID/PASS で「ユーザー用ID/PASS」の箱を開ける。ユーザー用の資格情報では開かない。
+  const ADMIN_KEY = 'fukubiki.admin';
+  let adminCred = null; // {id, pass}
+  async function tryAdmin(aid, apass) {
+    if (!draw.admin) return false;
+    try {
+      const box = await decryptJson(draw.admin, aid, apass);
+      adminCred = { id: String(aid).trim(), pass: String(apass) };
+      // 管理者はユーザー用データも扱えるようにする
+      if (locked && !cred && box.userId !== undefined) { if (await tryUnlock(box.userId, box.userPass)) { showLocked(false); renderStatus(); } }
+      if (!cred && box.userId !== undefined) cred = { id: box.userId, pass: box.userPass };
+      return true;
+    } catch { return false; }
   }
   async function tryUnlock(id, pass) {
     if (!locked) return true;
@@ -65,7 +81,7 @@
   function showLocked(isLocked) {
     el.login.hidden = !isLocked; el.entry.hidden = isLocked;
     el.stats.hidden = isLocked || !registered; el.history.hidden = isLocked || el.history.hidden;
-    el.adminOpen.hidden = isLocked; if (isLocked) el.admin.hidden = true;
+    if (isLocked) el.admin.hidden = true;
   }
   async function initLock() {
     if (!locked) { applyEntries(draw.entries); showLocked(false); renderStatus(); return; }
@@ -86,7 +102,7 @@
     showLocked(false); renderStatus(); el.input.focus();
   }
   function logout() {
-    try { localStorage.removeItem(CRED_KEY); sessionStorage.removeItem(CRED_KEY); } catch { /* ignore */ }
+    try { localStorage.removeItem(CRED_KEY); sessionStorage.removeItem(CRED_KEY); sessionStorage.removeItem(ADMIN_KEY); } catch { /* ignore */ }
     location.reload();
   }
 
@@ -562,9 +578,13 @@
   }
   async function publishDraw({ title, entries }, doneText) {
     if (!artifactApi) { admMsg('この画面からは公開できません。claude.ai で開いた自分のページからお試しください。', 'err'); return; }
+    if (!adminCred) { admMsg('管理者としてログインしてください。', 'err'); return; }
     const protect = el.admProtect.checked;
     const id = el.admId.value.trim(), pass = el.admPass.value;
-    if (protect && (!id || !pass)) { admMsg('IDとパスワードを入力してください（保護しない場合はチェックを外してください）。', 'err'); return; }
+    const aid = el.admAid.value.trim(), apass = el.admApass.value;
+    if (protect && (!id || !pass)) { admMsg('ユーザー用のIDとパスワードを入力してください（保護しない場合はチェックを外してください）。', 'err'); return; }
+    if (!aid || !apass) { admMsg('管理者IDとパスワードを入力してください。', 'err'); return; }
+    if (protect && aid === id && apass === pass) { admMsg('管理者用とユーザー用は別のID・パスワードにしてください。', 'err'); return; }
     el.admPublish.disabled = true; el.admClear.disabled = true;
     admMsg('公開しています…', 'ok');
     try {
@@ -576,6 +596,8 @@
       } else {
         newDraw = { title, updatedAt: new Date().toISOString(), locked: false, entries };
       }
+      newDraw.admin = await encryptJson(protect ? { userId: id, userPass: pass } : {}, aid, apass);
+      try { sessionStorage.setItem(ADMIN_KEY, JSON.stringify({ id: aid, pass: apass })); } catch { /* ignore */ }
       try { sessionStorage.setItem('fukubiki.published', doneText); } catch { /* ignore */ }
       await artifactApi.publish(buildPageHtml(newDraw));
       admMsg(doneText, 'ok');
@@ -595,7 +617,30 @@
     admMsg(r.entries.length ? `${r.entries.length} 件を読み取りました。内容を確認して「この内容で公開する」を押してください。` : '当選番号を1件も読み取れませんでした。レイアウトが昨年と同じか確認するか、テキストから登録してください。', r.entries.length ? 'ok' : 'err');
   }
   function initAdmin() {
-    el.adminOpen.addEventListener('click', () => { el.admin.hidden = !el.admin.hidden; if (!el.admin.hidden) el.admin.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+    el.adminOpen.addEventListener('click', () => {
+      if (!adminCred) { el.adminLogin.hidden = false; el.aloginMsg.hidden = true; el.adminLogin.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.aloginId.focus(); return; }
+      el.admin.hidden = !el.admin.hidden; if (!el.admin.hidden) el.admin.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    el.aloginClose.addEventListener('click', () => { el.adminLogin.hidden = true; });
+    async function onAdminLogin() {
+      el.aloginBtn.disabled = true; el.aloginMsg.hidden = true;
+      const ok = await tryAdmin(el.aloginId.value, el.aloginPass.value);
+      el.aloginBtn.disabled = false;
+      if (!ok) { el.aloginMsg.textContent = '管理者IDまたはパスワードが違います。'; el.aloginMsg.hidden = false; el.aloginPass.value = ''; return; }
+      try { sessionStorage.setItem(ADMIN_KEY, JSON.stringify(adminCred)); } catch { /* ignore */ }
+      el.adminLogin.hidden = true; el.aloginPass.value = '';
+      openAdminPanel();
+    }
+    function openAdminPanel() {
+      el.admAid.value = adminCred.id; el.admApass.value = adminCred.pass;
+      if (cred) { el.admId.value = cred.id; el.admPass.value = cred.pass; }
+      el.admProtect.checked = locked || !!cred; el.admCred.hidden = !el.admProtect.checked;
+      el.admin.hidden = false; el.admin.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    el.aloginBtn.addEventListener('click', onAdminLogin);
+    el.aloginPass.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); onAdminLogin(); } });
+    // 同じセッション内（公開後のリロード）では管理者ログインを維持
+    (async () => { try { const s = JSON.parse(sessionStorage.getItem(ADMIN_KEY) || 'null'); if (s && (await tryAdmin(s.id, s.pass)) && el.admin && !el.admin.hidden) openAdminPanel(); } catch { /* ignore */ } })();
     el.admClose.addEventListener('click', () => { el.admin.hidden = true; });
     el.admFile.addEventListener('change', async (e) => {
       const file = e.target.files && e.target.files[0]; if (!file) return;
@@ -616,8 +661,8 @@
     });
     el.admLogout.addEventListener('click', logout);
     el.admProtect.addEventListener('change', () => { el.admCred.hidden = !el.admProtect.checked; });
-    el.adminOpen.addEventListener('click', () => { if (cred) { if (!el.admId.value) el.admId.value = cred.id; if (!el.admPass.value) el.admPass.value = cred.pass; } el.admProtect.checked = locked || !!cred; el.admCred.hidden = !el.admProtect.checked; });
     try { const m = sessionStorage.getItem('fukubiki.published'); if (m) { sessionStorage.removeItem('fukubiki.published'); el.admin.hidden = false; admMsg(m, 'ok'); } } catch { /* ignore */ }
+    if (!draw.admin) { el.adminOpen.hidden = true; }
     const use = window.claude && typeof window.claude.use === 'function' ? window.claude.use('artifact') : Promise.resolve(null);
     use.then((api) => {
       artifactApi = api;

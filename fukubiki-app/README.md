@@ -126,8 +126,10 @@ npm run build:artifact -- samples/2025_tousen.pdf --title "2025年 当選発表"
 ### ID・パスワード保護
 
 `--id` と `--pass` を付けてビルドすると、当選リストは ID＋パスワードから導出した鍵（PBKDF2 → AES-GCM）で暗号化して埋め込まれ、ページはログイン必須になります。正しい組み合わせが無いとページのソースを見ても当選データは読めません。
-ページ内の管理パネルからも ID／パスワードを変更して再公開できます。`<meta name="robots" content="noindex">` を入れているため検索エンジンの索引対象になりません。
+管理パネルは別の管理者ID／パスワード（`--admin-id` / `--admin-pass`、必須）で保護されます。管理者鍵でユーザー用ID／パスワードを暗号化した箱を埋め込んでおり、管理者ログインでのみ開きます。ユーザー用のID／パスワードでは管理パネルに入れません。
+ページ内の管理パネルからは両方の ID／パスワードを変更して再公開できます。`<meta name="robots" content="noindex">` を入れているため検索エンジンの索引対象になりません。
 
 ```bash
-npm run build:artifact -- samples/2025_tousen.pdf --title "2026年 当選発表" --id 好きなID --pass 好きなパスワード
+npm run build:artifact -- samples/2025_tousen.pdf --title "2026年 当選発表" \
+  --id ユーザー用ID --pass ユーザー用パスワード --admin-id 管理者ID --admin-pass 管理者パスワード
 ```

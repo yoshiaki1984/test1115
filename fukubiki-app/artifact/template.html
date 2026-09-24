@@ -176,17 +176,30 @@ details summary{cursor:pointer;color:var(--gold2);font-weight:700;font-size:14px
       <ul id="history-list" class="hist"></ul>
     </section>
 
+    <section class="card admin" id="admin-login" hidden>
+      <h2>管理者ログイン</h2>
+      <p>管理者用のIDとパスワードを入力してください。ユーザー用のIDでは入れません。</p>
+      <label class="tfield">管理者ID<input id="alogin-id" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <label class="tfield">管理者パスワード<input id="alogin-pass" type="password" autocomplete="off"></label>
+      <div class="row"><button id="alogin-btn" class="primary sm" type="button">管理者としてログイン</button><button id="alogin-close" class="ghost" type="button">閉じる</button></div>
+      <p id="alogin-msg" class="notice" hidden></p>
+    </section>
+
     <section class="card admin" id="admin" hidden>
       <h2>当選番号の登録（管理）</h2>
       <p>昨年と同じレイアウト（「当選番号」「品名」の2列表）の発表PDFを読み込みます。「公開する」でこのページが更新され、リンクを開いた全員に反映されます。登録できるのはこのページの編集権限がある人だけです。</p>
       <div id="adm-env" class="amsg warn" hidden style="margin:0 0 12px">この開き方では公開できません。claude.ai にログインした状態でArtifactのリンクを開き直してください。</div>
       <label class="tfield">タイトル<input id="adm-title" type="text" placeholder="例: 2026年 当選発表"></label>
-      <label class="hint" style="display:flex;gap:8px;align-items:center;margin:0 0 10px"><input id="adm-protect" type="checkbox" checked>IDとパスワードで保護する（当選データを暗号化して公開）</label>
+      <label class="hint" style="display:flex;gap:8px;align-items:center;margin:0 0 10px"><input id="adm-protect" type="checkbox" checked>ユーザー用IDとパスワードで保護する（当選データを暗号化して公開）</label>
       <div class="row" id="adm-cred">
-        <label class="tfield" style="flex:1">ID<input id="adm-id" type="text" autocapitalize="off" spellcheck="false"></label>
-        <label class="tfield" style="flex:1">パスワード<input id="adm-pass" type="text" autocapitalize="off" spellcheck="false"></label>
+        <label class="tfield" style="flex:1">ユーザー用ID<input id="adm-id" type="text" autocapitalize="off" spellcheck="false"></label>
+        <label class="tfield" style="flex:1">ユーザー用パスワード<input id="adm-pass" type="text" autocapitalize="off" spellcheck="false"></label>
       </div>
-      <p class="hint" style="margin:-4px 0 12px">IDとパスワードを変えて公開すると、全員が新しいものでログインし直しになります。</p>
+      <div class="row">
+        <label class="tfield" style="flex:1">管理者ID<input id="adm-aid" type="text" autocapitalize="off" spellcheck="false"></label>
+        <label class="tfield" style="flex:1">管理者パスワード<input id="adm-apass" type="text" autocapitalize="off" spellcheck="false"></label>
+      </div>
+      <p class="hint" style="margin:-4px 0 12px">ID・パスワードを変えて公開すると、次回からは新しいものでログインし直しになります。</p>
       <label class="file"><input id="adm-file" type="file" accept="application/pdf,.pdf"><span id="adm-file-label">📄 PDFファイルを選択</span></label>
       <details>
         <summary>テキストから登録する（PDFが読めない場合）</summary>
@@ -199,14 +212,14 @@ details summary{cursor:pointer;color:var(--gold2);font-weight:700;font-size:14px
         <button id="adm-publish" class="primary sm" type="button" disabled>この内容で公開する</button>
       </div>
       <div class="row" style="margin-top:8px">
-        <button id="adm-logout" class="ghost" type="button">この端末からログアウト</button>
+        <button id="adm-logout" class="ghost" type="button">この端末からログアウト（全員分）</button>
         <button id="adm-clear" class="ghost" type="button">登録を消して公開</button>
         <button id="adm-close" class="ghost" type="button">閉じる</button>
       </div>
     </section>
   </main>
 
-  <footer class="foot"><button id="admin-open" type="button">🛠 管理者用: 当選発表PDFを登録する</button></footer>
+  <footer class="foot"><button id="admin-open" type="button">🛠 管理者用: 当選発表PDFを登録する（管理者ログインが必要）</button></footer>
 </div>
 
 <div id="stage" class="stage" hidden aria-live="polite">

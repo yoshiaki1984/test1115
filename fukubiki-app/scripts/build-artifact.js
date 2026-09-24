@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
  * サーバー不要のシングルHTML版（claude.ai Artifact 用）を組み立てる。
- *   npm run build:artifact -- [seed.pdf] [--title "タイトル"] [--id ID --pass パスワード] [--out dist/fukubiki.html]
+ *   npm run build:artifact -- [seed.pdf] [--title "タイトル"] [--id ID --pass パスワード] --admin-id 管理者ID --admin-pass 管理者パスワード [--out dist/fukubiki.html]
  * seed.pdf を渡すとその当選リストを埋め込む。省略時は未登録状態で出力。
  * --id / --pass を渡すと当選リストを AES-GCM で暗号化して埋め込み、ページはログイン必須になる。
+ * --admin-id / --admin-pass（必須）は管理パネル用。ユーザー用ID/PASSを管理者鍵で暗号化した箱を埋め込む。
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -24,20 +25,28 @@ if (pdf) {
 }
 
 const id = opt('--id', ''), pass = opt('--pass', '');
+const adminId = opt('--admin-id', ''), adminPass = opt('--admin-pass', '');
 if ((id && !pass) || (!id && pass)) throw new Error('--id と --pass は両方指定してください');
-if (id) {
+if (!adminId || !adminPass) throw new Error('--admin-id と --admin-pass は必須です');
+if (id && adminId === id && adminPass === pass) throw new Error('管理者用とユーザー用は別のID・パスワードにしてください');
+
+async function encryptJson(obj, uid, upass) {
   const { subtle } = globalThis.crypto;
-  const getRandomValues = (a) => globalThis.crypto.getRandomValues(a);
   const enc = new TextEncoder();
-  const salt = getRandomValues(new Uint8Array(16)), iv = getRandomValues(new Uint8Array(12));
-  const km = await subtle.importKey('raw', enc.encode(`${id.trim()}\n${pass}`), 'PBKDF2', false, ['deriveKey']);
+  const salt = globalThis.crypto.getRandomValues(new Uint8Array(16)), iv = globalThis.crypto.getRandomValues(new Uint8Array(12));
+  const km = await subtle.importKey('raw', enc.encode(`${uid.trim()}\n${upass}`), 'PBKDF2', false, ['deriveKey']);
   const key = await subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 120000, hash: 'SHA-256' }, km, { name: 'AES-GCM', length: 256 }, false, ['encrypt']);
-  const cipher = await subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(draw.entries)));
+  const cipher = await subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(obj)));
   const b64 = (b) => Buffer.from(b).toString('base64');
-  draw = { title: draw.title, updatedAt: draw.updatedAt, locked: true, count: draw.entries.length, salt: b64(salt), iv: b64(iv), cipher: b64(cipher) };
+  return { salt: b64(salt), iv: b64(iv), cipher: b64(cipher) };
+}
+if (id) {
+  const c = await encryptJson(draw.entries, id, pass);
+  draw = { title: draw.title, updatedAt: draw.updatedAt, locked: true, count: draw.entries.length, ...c };
 } else {
   draw = { ...draw, locked: false };
 }
+draw.admin = await encryptJson(id ? { userId: id, userPass: pass } : {}, adminId, adminPass);
 
 const dir = path.join(__dirname, '..', 'artifact');
 const tpl = fs.readFileSync(path.join(dir, 'template.html'), 'utf8');
